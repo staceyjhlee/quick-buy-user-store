@@ -1,34 +1,27 @@
-
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+import { useProfiles } from "@/hooks/useProfiles";
 
 const Users = () => {
-  // This is placeholder data until we connect to Supabase
-  const users = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@example.com",
-      role: "admin",
-      orders: 5
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane.smith@example.com",
-      role: "customer",
-      orders: 3
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      email: "mike.johnson@example.com",
-      role: "customer",
-      orders: 1
-    }
-  ];
+  const { data: profiles, isLoading, error } = useProfiles();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p>Loading users...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p>Error loading users. Please try again.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -66,17 +59,19 @@ const Users = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map(user => (
-                <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.id}</TableCell>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
+              {profiles?.map(profile => (
+                <TableRow key={profile.id}>
+                  <TableCell className="font-medium">
+                    {profile.id.slice(0, 8)}...
+                  </TableCell>
+                  <TableCell>{profile.full_name || 'No name'}</TableCell>
+                  <TableCell>{profile.email || 'No email'}</TableCell>
                   <TableCell>
-                    <Badge variant={user.role === "admin" ? "destructive" : "secondary"}>
-                      {user.role}
+                    <Badge variant="secondary">
+                      customer
                     </Badge>
                   </TableCell>
-                  <TableCell>{user.orders}</TableCell>
+                  <TableCell>{profile.orders?.length || 0}</TableCell>
                   <TableCell className="space-x-2">
                     <Button variant="outline" size="sm">Edit</Button>
                     <Button variant="outline" size="sm">Delete</Button>

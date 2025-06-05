@@ -3,48 +3,41 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+import { useOrders } from "@/hooks/useOrders";
 
 const Orders = () => {
-  // This is placeholder data until we connect to Supabase
-  const orders = [
-    {
-      id: "ORD-001",
-      customer: "John Doe",
-      date: "2025-05-30",
-      totalPrice: 149.99,
-      status: "completed",
-      items: 2
-    },
-    {
-      id: "ORD-002",
-      customer: "Jane Smith",
-      date: "2025-06-01",
-      totalPrice: 99.99,
-      status: "processing",
-      items: 1
-    },
-    {
-      id: "ORD-003",
-      customer: "Mike Johnson",
-      date: "2025-06-03",
-      totalPrice: 199.98,
-      status: "pending",
-      items: 3
-    }
-  ];
+  const { data: orders, isLoading, error } = useOrders();
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "success";
-      case "processing":
-        return "warning";
-      case "pending":
         return "default";
+      case "processing":
+        return "secondary";
+      case "pending":
+        return "outline";
+      case "cancelled":
+        return "destructive";
       default:
         return "secondary";
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p>Loading orders...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p>Error loading orders. Please try again.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -83,13 +76,21 @@ const Orders = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {orders.map(order => (
+              {orders?.map(order => (
                 <TableRow key={order.id}>
-                  <TableCell className="font-medium">{order.id}</TableCell>
-                  <TableCell>{order.customer}</TableCell>
-                  <TableCell>{order.date}</TableCell>
-                  <TableCell>{order.items}</TableCell>
-                  <TableCell>${order.totalPrice.toFixed(2)}</TableCell>
+                  <TableCell className="font-medium">
+                    {order.id.slice(0, 8)}...
+                  </TableCell>
+                  <TableCell>
+                    {order.profiles?.full_name || order.profiles?.email || 'Unknown'}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(order.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    {order.order_items?.length || 0}
+                  </TableCell>
+                  <TableCell>${order.total_amount}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusColor(order.status) as any}>
                       {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
