@@ -41,11 +41,19 @@ const Layout = ({ children, currentPage }: LayoutProps) => {
             >
               Users
             </Link>
+            <Link 
+              to="/cart" 
+              className={`text-gray-600 hover:text-gray-900 ${currentPage === 'cart' ? 'font-medium' : ''}`}
+            >
+              Cart
+            </Link>
           </nav>
           <div className="flex space-x-2">
-            <Button variant="outline" size="icon">
-              <ShoppingCart className="h-5 w-5" />
-            </Button>
+            <Link to="/cart">
+              <Button variant="outline" size="icon">
+                <ShoppingCart className="h-5 w-5" />
+              </Button>
+            </Link>
             <Button>Sign In</Button>
           </div>
         </div>

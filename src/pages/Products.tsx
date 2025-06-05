@@ -1,12 +1,13 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useProducts } from "@/hooks/useProducts";
+import { useCart } from "@/hooks/useCart";
 
 const Products = () => {
   const { data: products, isLoading, error } = useProducts();
+  const { addToCart, isAddingToCart } = useCart();
 
   if (isLoading) {
     return (
@@ -38,9 +39,11 @@ const Products = () => {
             <Link to="/users" className="text-gray-600 hover:text-gray-900">Users</Link>
           </nav>
           <div className="flex space-x-2">
-            <Button variant="outline" size="icon">
-              <ShoppingCart className="h-5 w-5" />
-            </Button>
+            <Link to="/cart">
+              <Button variant="outline" size="icon">
+                <ShoppingCart className="h-5 w-5" />
+              </Button>
+            </Link>
             <Button>Sign In</Button>
           </div>
         </div>
@@ -80,8 +83,12 @@ const Products = () => {
               </CardContent>
               <CardFooter className="flex justify-between">
                 <Button variant="outline">View Details</Button>
-                <Button>
-                  <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
+                <Button
+                  onClick={() => addToCart({ productId: product.id })}
+                  disabled={isAddingToCart || product.stock_quantity === 0}
+                >
+                  <ShoppingCart className="mr-2 h-4 w-4" />
+                  {product.stock_quantity === 0 ? 'Out of Stock' : 'Add to Cart'}
                 </Button>
               </CardFooter>
             </Card>
