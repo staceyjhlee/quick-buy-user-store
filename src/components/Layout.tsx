@@ -1,7 +1,14 @@
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, User, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -9,6 +16,14 @@ interface LayoutProps {
 }
 
 const Layout = ({ children, currentPage }: LayoutProps) => {
+  const { user, signOut, loading } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-white shadow-sm">
@@ -48,13 +63,37 @@ const Layout = ({ children, currentPage }: LayoutProps) => {
               Cart
             </Link>
           </nav>
-          <div className="flex space-x-2">
+          <div className="flex space-x-2 items-center">
             <Link to="/cart">
               <Button variant="outline" size="icon">
                 <ShoppingCart className="h-5 w-5" />
               </Button>
             </Link>
-            <Button>Sign In</Button>
+            
+            {!loading && (
+              user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="flex items-center space-x-2">
+                      <User className="h-4 w-4" />
+                      <span className="hidden sm:inline">
+                        {user.email?.split('@')[0] || 'User'}
+                      </span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={handleSignOut}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link to="/auth">
+                  <Button>Sign In</Button>
+                </Link>
+              )
+            )}
           </div>
         </div>
       </header>
