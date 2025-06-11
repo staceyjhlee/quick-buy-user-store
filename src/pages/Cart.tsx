@@ -4,7 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trash2, Plus, Minus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCart } from "@/hooks/useCart";
+import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/Layout";
+import CheckoutForm from "@/components/CheckoutForm";
+import { useState } from "react";
 
 const Cart = () => {
   const { 
@@ -16,6 +19,8 @@ const Cart = () => {
     isRemovingFromCart,
     isUpdatingQuantity 
   } = useCart();
+  const { user } = useAuth();
+  const [showCheckout, setShowCheckout] = useState(false);
 
   if (isLoading) {
     return (
@@ -46,6 +51,23 @@ const Cart = () => {
       updateQuantity({ cartItemId, quantity: newQuantity });
     }
   };
+
+  const handleCheckout = () => {
+    setShowCheckout(true);
+  };
+
+  if (showCheckout) {
+    return (
+      <Layout currentPage="cart">
+        <CheckoutForm 
+          cartItems={cartItems || []}
+          total={total}
+          user={user}
+          onBack={() => setShowCheckout(false)}
+        />
+      </Layout>
+    );
+  }
 
   return (
     <Layout currentPage="cart">
@@ -151,7 +173,7 @@ const Cart = () => {
                   <span>${total.toFixed(2)}</span>
                 </div>
               </div>
-              <Button className="w-full mt-4" size="lg">
+              <Button className="w-full mt-4" size="lg" onClick={handleCheckout}>
                 Proceed to Checkout
               </Button>
             </CardContent>
