@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Users, Package } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
+  const { user, loading } = useAuth();
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
@@ -17,10 +20,21 @@ const Index = () => {
             <Link to="/users" className="text-gray-600 hover:text-gray-900">Users</Link>
           </nav>
           <div className="flex space-x-2">
-            <Button variant="outline" size="icon">
-              <ShoppingCart className="h-5 w-5" />
-            </Button>
-            <Button>Sign In</Button>
+            <Link to="/cart">
+              <Button variant="outline" size="icon">
+                <ShoppingCart className="h-5 w-5" />
+              </Button>
+            </Link>
+            {!loading && !user && (
+              <Link to="/auth">
+                <Button>Sign In</Button>
+              </Link>
+            )}
+            {user && (
+              <span className="text-sm text-gray-600 self-center">
+                Welcome, {user.email?.split('@')[0]}!
+              </span>
+            )}
           </div>
         </div>
       </header>

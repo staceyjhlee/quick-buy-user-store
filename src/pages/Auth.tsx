@@ -26,20 +26,42 @@ const Auth = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Sign in form submitted with:', signInEmail);
+    
+    if (!signInEmail || !signInPassword) {
+      console.log('Missing email or password');
+      return;
+    }
+    
     setIsSignInLoading(true);
-    console.log('Attempting sign in with:', signInEmail);
-    const result = await signIn(signInEmail, signInPassword);
-    console.log('Sign in result:', result);
-    setIsSignInLoading(false);
+    try {
+      const result = await signIn(signInEmail, signInPassword);
+      console.log('Sign in completed:', result);
+    } catch (error) {
+      console.error('Sign in error:', error);
+    } finally {
+      setIsSignInLoading(false);
+    }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Sign up form submitted with:', signUpEmail);
+    
+    if (!signUpEmail || !signUpPassword) {
+      console.log('Missing email or password for signup');
+      return;
+    }
+    
     setIsSignUpLoading(true);
-    console.log('Attempting sign up with:', signUpEmail);
-    const result = await signUp(signUpEmail, signUpPassword, fullName);
-    console.log('Sign up result:', result);
-    setIsSignUpLoading(false);
+    try {
+      const result = await signUp(signUpEmail, signUpPassword, fullName);
+      console.log('Sign up completed:', result);
+    } catch (error) {
+      console.error('Sign up error:', error);
+    } finally {
+      setIsSignUpLoading(false);
+    }
   };
 
   return (
@@ -59,7 +81,7 @@ const Auth = () => {
                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="signin" className="space-y-4">
+              <TabsContent value="signin" className="space-y-4 mt-4">
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signin-email">Email</Label>
@@ -83,16 +105,20 @@ const Auth = () => {
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={isSignInLoading}>
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={isSignInLoading || !signInEmail || !signInPassword}
+                  >
                     {isSignInLoading ? 'Signing in...' : 'Sign In'}
                   </Button>
                 </form>
               </TabsContent>
               
-              <TabsContent value="signup" className="space-y-4">
+              <TabsContent value="signup" className="space-y-4 mt-4">
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="signup-name">Full Name</Label>
+                    <Label htmlFor="signup-name">Full Name (Optional)</Label>
                     <Input
                       id="signup-name"
                       type="text"
@@ -117,13 +143,18 @@ const Auth = () => {
                     <Input
                       id="signup-password"
                       type="password"
-                      placeholder="Create a password"
+                      placeholder="Create a password (min 6 characters)"
                       value={signUpPassword}
                       onChange={(e) => setSignUpPassword(e.target.value)}
                       required
+                      minLength={6}
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={isSignUpLoading}>
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={isSignUpLoading || !signUpEmail || !signUpPassword || signUpPassword.length < 6}
+                  >
                     {isSignUpLoading ? 'Creating account...' : 'Create Account'}
                   </Button>
                 </form>
